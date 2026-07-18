@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { GlassCard, SectionTitle, GhostButton, Pill } from "../ui";
+import ProfilesSection from "../ProfilesSection";
 import { educationTopics, strategyQuestions } from "@/lib/mockData";
 
 type ChatMsg = { role: "user" | "assistant"; text: string };
@@ -36,6 +37,8 @@ export default function TechnicalsTab() {
 
   return (
     <div className="flex flex-col gap-4 pb-28">
+      <ProfilesSection />
+
       <GlassCard>
         <div className="flex items-center justify-between">
           <SectionTitle>Strategy Health Check</SectionTitle>

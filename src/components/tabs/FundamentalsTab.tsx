@@ -2,11 +2,14 @@
 
 import { useState } from "react";
 import { GlassCard, SectionTitle, BiasPill, Pill } from "../ui";
+import { NewsList } from "../NewsCard";
 import { analystDocStatus, fundamentals } from "@/lib/mockData";
+import { newsFeed } from "@/lib/newsAndProfiles";
 
 export default function FundamentalsTab() {
   const [selected, setSelected] = useState(fundamentals[0].currency);
   const active = fundamentals.find((f) => f.currency === selected)!;
+  const currencyNews = newsFeed.filter((n) => n.currency === selected);
 
   const impactColor = (impact: string) =>
     impact === "high" ? "var(--bear)" : impact === "medium" ? "var(--accent)" : "var(--muted)";
@@ -71,6 +74,17 @@ export default function FundamentalsTab() {
             </div>
           ))}
         </div>
+      </GlassCard>
+
+      <GlassCard>
+        <SectionTitle>{active.currency} News & Impact</SectionTitle>
+        {currencyNews.length > 0 ? (
+          <div className="mt-2">
+            <NewsList items={currencyNews} />
+          </div>
+        ) : (
+          <p className="mt-2 text-xs text-muted">No recent news items for {active.currency}.</p>
+        )}
       </GlassCard>
     </div>
   );

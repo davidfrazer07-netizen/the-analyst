@@ -1,6 +1,7 @@
 "use client";
 
 import { GlassCard, SectionTitle, BiasPill } from "../ui";
+import HealthCheckQuiz from "../HealthCheckQuiz";
 import { journal } from "@/lib/mockData";
 import { JTrade } from "@/lib/types";
 
@@ -40,6 +41,8 @@ export default function JournalTab() {
 
   return (
     <div className="flex flex-col gap-4 pb-28">
+      <HealthCheckQuiz />
+
       <GlassCard>
         <div className="flex items-center justify-between">
           <SectionTitle>Account Health</SectionTitle>

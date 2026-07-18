@@ -95,3 +95,83 @@ export interface P2POffer {
   trustScore: number;
   completedTrades: number;
 }
+
+// --- News Feed (matches Tara's today.json worldNews[] schema exactly)
+
+export type NewsRegion = "North America" | "South America" | "Europe" | "Asia" | "Middle East";
+export type NewsImpact = "positive" | "negative" | "neutral";
+
+export interface NewsItem {
+  region: NewsRegion;
+  currency: string;
+  headline: string;
+  detail: string;
+  source: string;
+  url: string;
+  hot: boolean;
+  impact: NewsImpact;
+  impactNote: string;
+  strength: number; // 1-5, drives the 5-dot impact meter
+  firstSeen: string;
+}
+
+// --- Delivery Profiles (tradersfeed.pro, matches Tara's profiles.json schema)
+
+export interface DeliveryProfile {
+  id: string;
+  num: number;
+  title: string;
+  marketConditions: string[];
+  keyCharacteristics: string[];
+  traderFocus: string[];
+}
+
+export interface ProfileWindowSet {
+  label: string;
+  windows: string[];
+  profiles: DeliveryProfile[];
+}
+
+export interface DeliveryProfiles {
+  am: ProfileWindowSet;
+  pm: ProfileWindowSet;
+}
+
+// --- Trading System Health Check (Journal tab)
+
+export interface HealthCheckOption {
+  key: "A" | "B" | "C" | "D";
+  text: string;
+  scores: {
+    risk: number;
+    consistency: number;
+    process: number;
+    emotionalControl: number;
+    edgeClarity: number;
+  };
+}
+
+export interface HealthCheckQuestion {
+  id: string;
+  question: string;
+  options: HealthCheckOption[];
+}
+
+export interface HealthCheckBand {
+  id: string;
+  title: string;
+  percentileLabel: string;
+  diagnosis: string[];
+}
+
+export interface StabilizationRule {
+  title: string;
+  body: string;
+}
+
+export interface StabilizationPlan {
+  band: HealthCheckBand;
+  rules: StabilizationRule[];
+  willNotSolve: string[];
+  will: string[];
+}

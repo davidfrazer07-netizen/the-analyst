@@ -76,7 +76,7 @@ function project(lonDeg: number, latDeg: number, rot: number, R: number, cx: num
 }
 
 export default function WireframeGlobe({
-  tint = "#b06cff",
+  tint = "#2fb2ff",
   speed = 0.05,
   size = 380,
   opacity = 0.8,
@@ -103,7 +103,7 @@ export default function WireframeGlobe({
 
     let raf = 0;
     const hotColor = "#ff3b6b";
-    const coolColor = "#b06cff";
+    const coolColor = "#2fb2ff";
 
     const draw = (t: number) => {
       const time = t / 1000;
