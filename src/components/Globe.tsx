@@ -76,7 +76,7 @@ function project(lonDeg: number, latDeg: number, rot: number, R: number, cx: num
 }
 
 export default function WireframeGlobe({
-  tint = "#b06cff",
+  tint = "#2fb2ff",
   speed = 0.05,
   size = 380,
   opacity = 0.95,

@@ -2,15 +2,23 @@
 
 import WireframeGlobe from "./Globe";
 
-// Mirrors Tara-iOS's HUDBackground (Theme.swift): near-black base, a top
-// radial accent glow, a fixed 380px globe, and a bottom vignette fading
-// back to the base color. The globe is fixed-size rather than scaled to
-// the viewport — a much larger canvas (previously 900px) crops to a
-// sparse, illegible arc of dots on a phone-width screen instead of
-// reading as a legible rotating planet.
+// The globe is `position: fixed`, so as content scrolls, whatever card is
+// currently in its on-screen band covers it — with cards centered on the
+// same horizontal axis and close to the same width as a small globe, a
+// 380px circle ends up almost fully covered nearly all the time, only
+// showing in the thin gaps between cards. Sized much larger here so its
+// dot texture actually has presence across the gaps and gutters as the
+// page scrolls, rather than being one easily-covered circle.
+//
+// z-0, not a negative z-index: verified empirically (live DOM patch +
+// screenshot) that with <body> as a flex container, a negative z-index
+// here made this entire layer paint invisibly behind the page — even
+// though the canvas was provably drawing correct pixel content the whole
+// time. z-0 plus normal DOM order (this renders before the app content
+// in page.tsx) achieves the same "behind everything" effect correctly.
 export default function HUDBackground({ showGlobe = true }: { showGlobe?: boolean }) {
   return (
-    <div className="fixed inset-0 -z-10 overflow-hidden bg-bg">
+    <div className="fixed inset-0 z-0 overflow-hidden bg-bg">
       <div
         className="absolute inset-x-0 top-0 h-[420px]"
         style={{
@@ -20,13 +28,13 @@ export default function HUDBackground({ showGlobe = true }: { showGlobe?: boolea
       />
       {showGlobe && (
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-          <WireframeGlobe size={380} opacity={0.8} speed={0.05} />
+          <WireframeGlobe size={640} opacity={0.85} speed={0.05} />
         </div>
       )}
       <div
-        className="absolute inset-x-0 bottom-0 h-1/2"
+        className="absolute inset-x-0 bottom-0 h-1/3"
         style={{
-          background: "linear-gradient(to top, color-mix(in srgb, var(--bg) 85%, transparent), transparent)",
+          background: "linear-gradient(to top, color-mix(in srgb, var(--bg) 60%, transparent), transparent)",
         }}
       />
     </div>
