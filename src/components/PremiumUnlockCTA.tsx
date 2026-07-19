@@ -1,6 +1,7 @@
 "use client";
 
 import { GhostButton } from "./ui";
+import CryptoPaymentInfo from "./CryptoPaymentInfo";
 
 // Real payment isn't wired up — unlocking is manual: the user messages Dave
 // on WhatsApp, pays, and Dave confirms by granting the row in
@@ -25,6 +26,7 @@ export default function PremiumUnlockCTA() {
       <p className="mt-2 text-[11px] text-muted">
         Message Dave to pay — he&apos;ll confirm and unlock it on your account.
       </p>
+      <CryptoPaymentInfo />
     </div>
   );
 }
