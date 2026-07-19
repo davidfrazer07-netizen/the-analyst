@@ -29,6 +29,11 @@ export default function FundamentalsTab({ news, liveFundamentals }: Fundamentals
   const impactColor = (impact: string) =>
     impact === "high" ? "var(--bear)" : impact === "medium" ? "var(--accent)" : "var(--muted)";
 
+  const directionColor = (direction?: "positive" | "negative" | "neutral") =>
+    direction === "positive" ? "var(--bull)" : direction === "negative" ? "var(--bear)" : "var(--muted)";
+  const directionLabel = (direction?: "positive" | "negative" | "neutral") =>
+    direction === "positive" ? "Positive" : direction === "negative" ? "Negative" : "Neutral";
+
   return (
     <div className="flex flex-col gap-4 pb-28">
       <div className="flex gap-2 overflow-x-auto pb-1">
@@ -44,6 +49,24 @@ export default function FundamentalsTab({ news, liveFundamentals }: Fundamentals
           <SectionTitle>{active.currency} Fundamental View</SectionTitle>
           <BiasPill bias={active.bias} />
         </div>
+
+        {typeof active.strength === "number" ? (
+          <div className="mt-2">
+            <div className="flex items-center justify-between text-[10px] uppercase tracking-wide text-muted">
+              <span>{active.currency} Strength</span>
+              <span>{active.strength}/100</span>
+            </div>
+            <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-surface2/60">
+              <div
+                className="h-full rounded-full"
+                style={{ width: `${active.strength}%`, backgroundColor: "var(--accent)" }}
+              />
+            </div>
+          </div>
+        ) : (
+          <p className="mt-2 text-[10px] uppercase tracking-wide text-muted">No live strength score yet today</p>
+        )}
+
         <div className="mt-1 text-base font-semibold text-text">{active.headline}</div>
         <p className="mt-2 text-sm leading-relaxed text-muted">{active.summary}</p>
         <p className="mt-2 text-[10px] uppercase tracking-wide text-muted">Updated {active.updatedAt}</p>
@@ -64,7 +87,15 @@ export default function FundamentalsTab({ news, liveFundamentals }: Fundamentals
                 </span>
               </div>
               <p className="mt-1.5 text-xs leading-relaxed text-muted">{d.detail}</p>
-              {d.vsHistory && <p className="mt-1 text-xs italic text-purple-hi/80">{d.vsHistory}</p>}
+              <div className="mt-1.5 flex items-center gap-2">
+                <span
+                  className="text-[10px] font-bold uppercase tracking-wide"
+                  style={{ color: directionColor(d.direction) }}
+                >
+                  {directionLabel(d.direction)}
+                </span>
+                {d.vsHistory && <span className="text-xs italic text-purple-hi/80">{d.vsHistory}</span>}
+              </div>
             </div>
           ))}
         </div>

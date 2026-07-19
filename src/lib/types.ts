@@ -51,6 +51,7 @@ export interface FundamentalDriver {
   detail: string;
   impact: "high" | "medium" | "low";
   vsHistory: string; // e.g. "Stronger pull than the last 6 months' average"
+  direction?: "positive" | "negative" | "neutral"; // is this driver good or bad for the currency
 }
 
 export interface CurrencyFundamental {
@@ -60,6 +61,7 @@ export interface CurrencyFundamental {
   summary: string;
   drivers: FundamentalDriver[];
   updatedAt: string;
+  strength?: number; // 0-100 live strength score, when available from the Doc
 }
 
 // --- Technicals

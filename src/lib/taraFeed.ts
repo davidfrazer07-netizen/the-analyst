@@ -29,6 +29,7 @@ function mapBias(raw: unknown): Bias {
 interface StrengthEntry {
   name: string;
   bias: unknown;
+  value: unknown;
 }
 
 function isStrengthEntry(v: unknown): v is StrengthEntry {
@@ -76,19 +77,32 @@ export function useTaraFeed() {
         const summaryArr: unknown[] = Array.isArray(analysis?.summary) ? analysis.summary : [];
         const summary = summaryArr.filter((s): s is string => typeof s === "string").join(" ");
         const pointsArr: unknown[] = Array.isArray(analysis?.points) ? analysis.points : [];
+        const points = pointsArr.filter((p): p is string => typeof p === "string");
         const updatedAt = typeof data?.feed?.date === "string" ? data.feed.date : today;
-        const drivers = pointsArr
-          .filter((p): p is string => typeof p === "string")
-          .map((p) => ({ label: "Key driver", detail: p, impact: "medium" as const, vsHistory: "" }));
 
-        parsedFundamentals = strengthArr.filter(isStrengthEntry).map((s) => ({
-          currency: s.name,
-          bias: mapBias(s.bias),
-          headline,
-          summary,
-          drivers,
-          updatedAt,
-        }));
+        parsedFundamentals = strengthArr.filter(isStrengthEntry).map((s) => {
+          const bias = mapBias(s.bias);
+          // The Doc's points[] aren't tagged per-driver — the closest honest
+          // signal for whether a driver helps or hurts this currency is its
+          // own overall bias direction.
+          const direction: "positive" | "negative" | "neutral" =
+            bias === "bull" ? "positive" : bias === "bear" ? "negative" : "neutral";
+          return {
+            currency: s.name,
+            bias,
+            headline,
+            summary,
+            drivers: points.map((p) => ({
+              label: "Key driver",
+              detail: p,
+              impact: "medium" as const,
+              vsHistory: "",
+              direction,
+            })),
+            updatedAt,
+            strength: typeof s.value === "number" ? s.value : undefined,
+          };
+        });
       }
 
       if (!mountedRef.current) return true;

@@ -22,10 +22,14 @@ export default function Home() {
   const { isPremium } = usePremium();
 
   return (
-    <AuthGate>
-      <div className="relative flex min-h-screen flex-col">
+    <div className="relative flex min-h-screen flex-col">
+      {/* Rendered outside AuthGate so the globe/HUD is visible behind the
+          sign-in screen too, not just the authenticated app — AuthGate
+          replaces its children entirely with the login UI until a session
+          exists, so anything meant to show pre-auth can't live inside it. */}
+      <HUDBackground />
+      <AuthGate>
         {showIntro && <IntroSplash onDone={() => setShowIntro(false)} />}
-        <HUDBackground />
         <Header status={status} lastError={lastError} refresh={refresh} />
         <main className="mx-auto w-full max-w-md flex-1 px-4 pt-2">
           {tab === "fundamentals" && <FundamentalsTab news={news} liveFundamentals={fundamentals} />}
@@ -35,7 +39,7 @@ export default function Home() {
           {tab === "profile" && <ProfileTab isPremium={isPremium} />}
         </main>
         <TabBar active={tab} onChange={setTab} />
-      </div>
-    </AuthGate>
+      </AuthGate>
+    </div>
   );
 }

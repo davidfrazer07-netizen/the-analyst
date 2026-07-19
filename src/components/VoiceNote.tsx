@@ -47,6 +47,9 @@ export default function VoiceNote({ notes, onAddNote }: VoiceNoteProps) {
   const [transcript, setTranscript] = useState<string>("");
   const [interim, setInterim] = useState<string>("");
   const [supported, setSupported] = useState<boolean>(false);
+  // Set once recording stops, cleared once logged or discarded — lets the
+  // trader fix speech-to-text mistakes before it's saved and analyzed.
+  const [pendingTranscript, setPendingTranscript] = useState<string | null>(null);
 
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
 
@@ -102,10 +105,19 @@ export default function VoiceNote({ notes, onAddNote }: VoiceNoteProps) {
 
     const trimmed = transcript.trim();
     if (trimmed.length > 0) {
-      onAddNote(trimmed);
+      setPendingTranscript(trimmed);
     }
     setTranscript("");
     setInterim("");
+  };
+
+  const logPendingTrade = () => {
+    if (pendingTranscript === null) return;
+    const trimmed = pendingTranscript.trim();
+    if (trimmed.length > 0) {
+      onAddNote(trimmed);
+    }
+    setPendingTranscript(null);
   };
 
   return (
@@ -135,6 +147,26 @@ export default function VoiceNote({ notes, onAddNote }: VoiceNoteProps) {
             <div className="mt-3 rounded-xl border border-line bg-surface2/40 p-3 text-xs text-text">
               {transcript}
               {interim && <span className="italic text-muted">{interim}</span>}
+            </div>
+          )}
+
+          {pendingTranscript !== null && (
+            <div className="mt-3 rounded-xl border border-accent/50 bg-accent/5 p-3">
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-muted">
+                Review before logging
+              </p>
+              <textarea
+                value={pendingTranscript}
+                onChange={(e) => setPendingTranscript(e.target.value)}
+                rows={4}
+                className="mt-2 w-full rounded-xl border border-line bg-surface2/60 p-3 text-xs text-text focus:outline-none focus:border-accent"
+              />
+              <div className="mt-2 flex gap-2">
+                <GhostButton accent onClick={logPendingTrade} disabled={pendingTranscript.trim().length === 0}>
+                  Log Trade
+                </GhostButton>
+                <GhostButton onClick={() => setPendingTranscript(null)}>Discard</GhostButton>
+              </div>
             </div>
           )}
 
