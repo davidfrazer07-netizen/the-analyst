@@ -76,10 +76,10 @@ function project(lonDeg: number, latDeg: number, rot: number, R: number, cx: num
 }
 
 export default function WireframeGlobe({
-  tint = "#2fb2ff",
+  tint = "#b06cff",
   speed = 0.05,
   size = 380,
-  opacity = 0.8,
+  opacity = 0.95,
   className = "",
 }: {
   tint?: string;
@@ -103,7 +103,7 @@ export default function WireframeGlobe({
 
     let raf = 0;
     const hotColor = "#ff3b6b";
-    const coolColor = "#2fb2ff";
+    const coolColor = tint;
 
     const draw = (t: number) => {
       const time = t / 1000;
@@ -116,18 +116,18 @@ export default function WireframeGlobe({
 
       ctx.beginPath();
       ctx.arc(cx, cy, R, 0, Math.PI * 2);
-      ctx.strokeStyle = hexAlpha(tint, 0.28);
-      ctx.lineWidth = 1;
+      ctx.strokeStyle = hexAlpha(tint, 0.5);
+      ctx.lineWidth = 1.2;
       ctx.stroke();
 
       for (let oLa = -80; oLa <= 80; oLa += 6) {
         for (let oLo = -180; oLo < 180; oLo += 6) {
           const { x, y, z } = project(oLo, oLa, rot, R, cx, cy);
           if (z > 0.05) {
-            const r = 1.3;
+            const r = 1.5;
             ctx.beginPath();
             ctx.arc(x, y, r, 0, Math.PI * 2);
-            ctx.fillStyle = hexAlpha(tint, 0.22 + z * 0.2);
+            ctx.fillStyle = hexAlpha(tint, 0.35 + z * 0.35);
             ctx.fill();
           }
         }
@@ -136,8 +136,8 @@ export default function WireframeGlobe({
       for (const [lo2, la2] of LAND_DOTS) {
         const { x, y, z } = project(lo2, la2, rot, R, cx, cy);
         if (z > 0.04) {
-          const s = 1.4 + z * 1.8;
-          const op = 0.45 + z * 0.5;
+          const s = 1.6 + z * 2.0;
+          const op = 0.6 + z * 0.5;
           ctx.beginPath();
           ctx.arc(x, y, s / 2, 0, Math.PI * 2);
           ctx.fillStyle = hexAlpha(coolColor, op);
@@ -149,15 +149,15 @@ export default function WireframeGlobe({
         const { x, y, z } = project(n.lon, n.lat, rot, R, cx, cy);
         if (z > 0) {
           const col = n.hot ? hotColor : coolColor;
-          const glow = 7 + z * 4;
+          const glow = 9 + z * 5;
           ctx.beginPath();
           ctx.arc(x, y, glow, 0, Math.PI * 2);
-          ctx.fillStyle = hexAlpha(col, 0.2);
+          ctx.fillStyle = hexAlpha(col, 0.35);
           ctx.fill();
-          const r = 2 + z * 1.6;
+          const r = 2.5 + z * 1.8;
           ctx.beginPath();
           ctx.arc(x, y, r, 0, Math.PI * 2);
-          ctx.fillStyle = hexAlpha(col, 0.95);
+          ctx.fillStyle = hexAlpha(col, 1);
           ctx.fill();
         }
       }
