@@ -6,8 +6,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 // serves Tara's feed JSON. CORS is open (access-control-allow-origin: *),
 // confirmed against the live deployment, so this can be called directly
 // from the browser. Override via NEXT_PUBLIC_TARA_FEED_URL if redeployed.
+// GitHub Actions interpolates an unset `vars.*` reference as an empty
+// string, not "undefined" — so `??` alone would leave this as "" instead of
+// falling back. Use `||` so a blank env value also triggers the fallback.
 export const TARA_FEED_URL =
-  process.env.NEXT_PUBLIC_TARA_FEED_URL ??
+  process.env.NEXT_PUBLIC_TARA_FEED_URL ||
   "https://script.google.com/macros/s/AKfycbx0_G23rz2UJYdiaqVp9fxV7YPeZ_avCELuKiAFMeMZEubWBB4AFKnkfHpF1z43l-bUzg/exec";
 
 export type SyncStatus = "idle" | "loading" | "connected" | "error";
