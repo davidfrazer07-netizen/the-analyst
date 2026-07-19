@@ -56,10 +56,10 @@ export default function CoachTab() {
   }
 
   return (
-    <div className="flex flex-col gap-4 pb-28">
-      <GlassCard>
+    <div className="flex h-[calc(100dvh-176px)] flex-col">
+      <GlassCard className="flex flex-1 flex-col overflow-hidden">
         <SectionTitle>AI Coach</SectionTitle>
-        <div className="flex max-h-[420px] flex-col gap-2 overflow-y-auto">
+        <div className="mt-2 flex flex-1 flex-col gap-2 overflow-y-auto">
           {chat.map((m, i) =>
             m.role === "assistant" ? (
               <div key={i} className="max-w-[85%] self-start rounded-xl bg-surface2/60 px-3 py-2 text-xs leading-relaxed text-text">
@@ -75,7 +75,7 @@ export default function CoachTab() {
             )
           )}
         </div>
-        <div className="mt-3 flex items-center gap-2">
+        <div className="mt-3 flex shrink-0 items-center gap-2">
           <input
             name="coach-question"
             placeholder="Ask your coach anything..."

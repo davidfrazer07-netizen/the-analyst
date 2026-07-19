@@ -229,12 +229,19 @@ export function scoreHealthCheck(answers: Record<string, HealthCheckOption["key"
   const sum = DIMS.reduce((s, d) => s + totals[d], 0);
   const pct = maxPossible === 0 ? 0 : (sum / maxPossible) * 100;
 
+  // Thresholds calibrated to the REAL achievable range, not a theoretical
+  // 0-100%. Q1 is a neutral preference question (always contributes a fixed
+  // 50%), so the true floor/ceiling across all 9 questions is ~15.6%-82.2%,
+  // not 0-100%. Un-recalibrated thresholds made the top band mathematically
+  // unreachable (needed >90%, max possible was 82.2%), which is why results
+  // clustered in the middle bands regardless of how the questions were
+  // answered. These six cutoffs split the real ~15.6-82.2% range evenly.
   let band: HealthCheckBand;
-  if (pct < 18) band = healthCheckBands[0];
+  if (pct < 27) band = healthCheckBands[0];
   else if (pct < 38) band = healthCheckBands[1];
-  else if (pct < 58) band = healthCheckBands[2];
-  else if (pct < 74) band = healthCheckBands[3];
-  else if (pct < 90) band = healthCheckBands[4];
+  else if (pct < 49) band = healthCheckBands[2];
+  else if (pct < 60) band = healthCheckBands[3];
+  else if (pct < 71) band = healthCheckBands[4];
   else band = healthCheckBands[5];
 
   const weak = getWeakDimensions(totals, maxPerDim);

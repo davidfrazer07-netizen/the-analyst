@@ -39,6 +39,18 @@ function getSpeechRecognitionCtor(): (new () => SpeechRecognitionLike) | undefin
   return w.SpeechRecognition ?? w.webkitSpeechRecognition;
 }
 
+const STORAGE_KEY = "the-analyst:voice-notes";
+
+function loadStoredNotes(): VoiceNoteItem[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    return raw ? (JSON.parse(raw) as VoiceNoteItem[]) : [];
+  } catch {
+    return [];
+  }
+}
+
 export default function VoiceNote() {
   const [recording, setRecording] = useState<boolean>(false);
   const [transcript, setTranscript] = useState<string>("");
@@ -51,8 +63,14 @@ export default function VoiceNote() {
   useEffect(() => {
     if (typeof window !== "undefined") {
       setSupported(Boolean(getSpeechRecognitionCtor()));
+      setNotes(loadStoredNotes());
     }
   }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
+  }, [notes]);
 
   const startRecording = () => {
     const Ctor = getSpeechRecognitionCtor();
