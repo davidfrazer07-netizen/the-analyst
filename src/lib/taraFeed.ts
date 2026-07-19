@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { NewsItem } from "./types";
+import type { NewsItem, CurrencyFundamental, Bias } from "./types";
 
 // The deployed Google Apps Script Web App that reads Dave's daily Doc and
 // serves Tara's feed JSON. CORS is open (access-control-allow-origin: *),
@@ -18,9 +18,27 @@ export type SyncStatus = "idle" | "loading" | "connected" | "error";
 
 const RETRY_DELAYS_MS = [1500, 4000]; // Apps Script cold-starts can make the first call fail transiently.
 
+function mapBias(raw: unknown): Bias {
+  if (typeof raw !== "string") return "neutral";
+  const v = raw.toLowerCase();
+  if (v === "bullish") return "bull";
+  if (v === "bearish") return "bear";
+  return "neutral";
+}
+
+interface StrengthEntry {
+  name: string;
+  bias: unknown;
+}
+
+function isStrengthEntry(v: unknown): v is StrengthEntry {
+  return typeof v === "object" && v !== null && typeof (v as { name?: unknown }).name === "string";
+}
+
 export function useTaraFeed() {
   const [status, setStatus] = useState<SyncStatus>("idle");
   const [news, setNews] = useState<NewsItem[]>([]);
+  const [fundamentals, setFundamentals] = useState<CurrencyFundamental[]>([]);
   const [lastSynced, setLastSynced] = useState<string | null>(null);
   const [lastError, setLastError] = useState<string | null>(null);
   const mountedRef = useRef(true);
@@ -41,12 +59,41 @@ export function useTaraFeed() {
       // data does, so backfill it with today's date to satisfy NewsItem.
       const today = new Date().toISOString().slice(0, 10);
       const worldNews = Array.isArray(data?.feed?.worldNews) ? data.feed.worldNews : [];
-      const parsed: NewsItem[] = worldNews.map((item: Omit<NewsItem, "firstSeen">) => ({
+      const parsedNews: NewsItem[] = worldNews.map((item: Omit<NewsItem, "firstSeen">) => ({
         ...item,
         firstSeen: today,
       }));
+
+      // feed.analysis is a market-wide narrative (not per-currency), covering
+      // whichever currencies the Doc's strength[] happens to list that day —
+      // often a subset (e.g. USD/EUR/JPY, no GBP/AUD). Callers fall back to
+      // static data for currencies this doesn't cover.
+      const analysis = data?.feed?.analysis;
+      const strengthArr: unknown[] = Array.isArray(analysis?.strength) ? analysis.strength : [];
+      let parsedFundamentals: CurrencyFundamental[] = [];
+      if (analysis?.available === true && strengthArr.length > 0) {
+        const headline = typeof analysis?.headline === "string" ? analysis.headline : "";
+        const summaryArr: unknown[] = Array.isArray(analysis?.summary) ? analysis.summary : [];
+        const summary = summaryArr.filter((s): s is string => typeof s === "string").join(" ");
+        const pointsArr: unknown[] = Array.isArray(analysis?.points) ? analysis.points : [];
+        const updatedAt = typeof data?.feed?.date === "string" ? data.feed.date : today;
+        const drivers = pointsArr
+          .filter((p): p is string => typeof p === "string")
+          .map((p) => ({ label: "Key driver", detail: p, impact: "medium" as const, vsHistory: "" }));
+
+        parsedFundamentals = strengthArr.filter(isStrengthEntry).map((s) => ({
+          currency: s.name,
+          bias: mapBias(s.bias),
+          headline,
+          summary,
+          drivers,
+          updatedAt,
+        }));
+      }
+
       if (!mountedRef.current) return true;
-      setNews(parsed);
+      setNews(parsedNews);
+      setFundamentals(parsedFundamentals);
       setStatus("connected");
       setLastSynced(new Date().toISOString());
       setLastError(null);
@@ -75,5 +122,5 @@ export function useTaraFeed() {
     refresh();
   }, [refresh]);
 
-  return { status, news, lastSynced, lastError, refresh };
+  return { status, news, fundamentals, lastSynced, lastError, refresh };
 }

@@ -1,18 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { GlassCard, SectionTitle, Pill, GhostButton } from "./ui";
+import { GlassCard, SectionTitle, Pill } from "./ui";
 import ProfileDiagram, { ProfileSide } from "./ProfileDiagram";
+import PremiumUnlockCTA from "./PremiumUnlockCTA";
 import type { DeliveryProfiles } from "@/lib/types";
 import { deliveryProfiles } from "@/lib/newsAndProfiles";
 
-export default function ProfilesSection({
-  isUnlocked,
-  onUnlock,
-}: {
-  isUnlocked: boolean;
-  onUnlock: () => void;
-}) {
+export default function ProfilesSection({ isUnlocked }: { isUnlocked: boolean }) {
   const [session, setSession] = useState<"am" | "pm">("am");
   const [side, setSide] = useState<ProfileSide>("bull");
 
@@ -24,11 +19,7 @@ export default function ProfilesSection({
           These are Tara&apos;s tradersfeed.pro AM/PM delivery-profile schematics (Profile 1-3 for each session),
           showing market conditions, key characteristics and what to focus on as a trader.
         </p>
-        <div className="mt-4">
-          <GhostButton accent onClick={onUnlock}>
-            Unlock Premium (demo)
-          </GhostButton>
-        </div>
+        <PremiumUnlockCTA />
       </GlassCard>
     );
   }

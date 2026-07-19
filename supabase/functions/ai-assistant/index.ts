@@ -37,12 +37,68 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
-    const { message, history } = await req.json();
+    const body = await req.json();
+    const { message, history, mode } = body;
+
     if (!message || typeof message !== "string") {
       return new Response(JSON.stringify({ error: "Missing 'message' string in request body." }), {
         status: 400,
         headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
       });
+    }
+
+    if (mode === "voice-journal") {
+      const journalMessages = [
+        {
+          role: "system",
+          content:
+            'You are a trading journal analyst inside The Analyst app. Given a trader\'s raw voice note transcript about a trade they took, extract a concise structured journal entry. Respond with STRICT JSON only, no markdown fences, no commentary — exactly this shape: {"summary": string (1-2 sentences, third person, what happened), "sentiment": "disciplined" | "emotional" | "neutral", "keyLesson": string (one short actionable takeaway), "symbol": string or null (trading instrument/symbol mentioned, e.g. "XAUUSD", or null if none mentioned)}.',
+        },
+        { role: "user", content: message },
+      ];
+
+      const upstream = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "tencent/hy3:free",
+          messages: journalMessages,
+          response_format: { type: "json_object" },
+          max_tokens: 400,
+        }),
+      });
+
+      if (!upstream.ok) {
+        const detail = await upstream.text();
+        return new Response(JSON.stringify({ error: "Upstream model call failed.", detail }), {
+          status: 502,
+          headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
+        });
+      }
+
+      const data = await upstream.json();
+      const raw = data?.choices?.[0]?.message?.content ?? "";
+
+      try {
+        const parsed = JSON.parse(raw);
+        if (!parsed || typeof parsed.summary !== "string") {
+          return new Response(JSON.stringify({ error: "Could not parse journal analysis.", raw }), {
+            status: 502,
+            headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
+          });
+        }
+        return new Response(JSON.stringify({ journal: parsed }), {
+          headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
+        });
+      } catch {
+        return new Response(JSON.stringify({ error: "Could not parse journal analysis.", raw }), {
+          status: 502,
+          headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
+        });
+      }
     }
 
     const messages = [

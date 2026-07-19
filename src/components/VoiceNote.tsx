@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { GlassCard, SectionTitle, GhostButton } from "./ui";
+import type { VoiceNoteItem } from "@/lib/voiceNotes";
 
 interface SpeechRecognitionResultLike {
   isFinal: boolean;
@@ -24,12 +25,6 @@ interface SpeechRecognitionLike extends EventTarget {
   onend: (() => void) | null;
 }
 
-interface VoiceNoteItem {
-  id: string;
-  text: string;
-  timestamp: string;
-}
-
 function getSpeechRecognitionCtor(): (new () => SpeechRecognitionLike) | undefined {
   if (typeof window === "undefined") return undefined;
   const w = window as unknown as {
@@ -39,38 +34,27 @@ function getSpeechRecognitionCtor(): (new () => SpeechRecognitionLike) | undefin
   return w.SpeechRecognition ?? w.webkitSpeechRecognition;
 }
 
-const STORAGE_KEY = "the-analyst:voice-notes";
-
-function loadStoredNotes(): VoiceNoteItem[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    return raw ? (JSON.parse(raw) as VoiceNoteItem[]) : [];
-  } catch {
-    return [];
-  }
+interface VoiceNoteProps {
+  notes: VoiceNoteItem[];
+  onAddNote: (transcript: string) => void;
 }
 
-export default function VoiceNote() {
+const sentimentColor = (sentiment: VoiceNoteItem["aiSentiment"]) =>
+  sentiment === "disciplined" ? "var(--bull)" : sentiment === "emotional" ? "var(--bear)" : "var(--muted)";
+
+export default function VoiceNote({ notes, onAddNote }: VoiceNoteProps) {
   const [recording, setRecording] = useState<boolean>(false);
   const [transcript, setTranscript] = useState<string>("");
   const [interim, setInterim] = useState<string>("");
   const [supported, setSupported] = useState<boolean>(false);
-  const [notes, setNotes] = useState<VoiceNoteItem[]>([]);
 
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
       setSupported(Boolean(getSpeechRecognitionCtor()));
-      setNotes(loadStoredNotes());
     }
   }, []);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
-  }, [notes]);
 
   const startRecording = () => {
     const Ctor = getSpeechRecognitionCtor();
@@ -118,12 +102,7 @@ export default function VoiceNote() {
 
     const trimmed = transcript.trim();
     if (trimmed.length > 0) {
-      const newNote: VoiceNoteItem = {
-        id: typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : Date.now().toString(),
-        text: trimmed,
-        timestamp: new Date().toISOString(),
-      };
-      setNotes((prev) => [newNote, ...prev]);
+      onAddNote(trimmed);
     }
     setTranscript("");
     setInterim("");
@@ -139,7 +118,7 @@ export default function VoiceNote() {
         <>
           <p className="text-xs text-muted">
             Record what happened during a trade — entry reasoning, what you felt, what you&apos;d do differently. It
-            gets saved below for review.
+            gets saved below for review, and analyzed into a journal entry.
           </p>
 
           <div className="mt-3">
@@ -168,7 +147,26 @@ export default function VoiceNote() {
               {notes.map((note) => (
                 <div key={note.id} className="mt-2 rounded-xl border border-line bg-surface2/40 p-3">
                   <div className="text-[10px] text-muted">{new Date(note.timestamp).toLocaleString()}</div>
-                  <div className="mt-1 text-xs text-text">{note.text}</div>
+                  <div className="mt-1 text-xs text-text">{note.transcript}</div>
+                  {note.analyzing ? (
+                    <div className="mt-1.5 text-[10px] italic text-muted">Analyzing…</div>
+                  ) : (
+                    note.aiSummary && (
+                      <div className="mt-1.5 rounded-lg bg-accent/10 p-2">
+                        <span
+                          className="text-[10px] font-bold uppercase tracking-wide"
+                          style={{ color: sentimentColor(note.aiSentiment) }}
+                        >
+                          {note.aiSentiment ?? "analyzed"}
+                          {note.aiSymbol ? ` · ${note.aiSymbol}` : ""}
+                        </span>
+                        <p className="mt-1 text-[11px] text-muted">{note.aiSummary}</p>
+                        {note.aiKeyLesson && (
+                          <p className="mt-1 text-[11px] italic text-purple-hi/80">Lesson: {note.aiKeyLesson}</p>
+                        )}
+                      </div>
+                    )
+                  )}
                 </div>
               ))}
             </div>

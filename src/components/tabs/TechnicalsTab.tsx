@@ -4,16 +4,10 @@ import { GlassCard, SectionTitle } from "../ui";
 import ProfilesSection from "../ProfilesSection";
 import { educationTopics } from "@/lib/mockData";
 
-export default function TechnicalsTab({
-  isPremium,
-  onUnlock,
-}: {
-  isPremium: boolean;
-  onUnlock: () => void;
-}) {
+export default function TechnicalsTab({ isPremium }: { isPremium: boolean }) {
   return (
     <div className="flex flex-col gap-4 pb-28">
-      <ProfilesSection isUnlocked={isPremium} onUnlock={onUnlock} />
+      <ProfilesSection isUnlocked={isPremium} />
 
       <GlassCard>
         <SectionTitle>Learn: Concepts & Videos</SectionTitle>

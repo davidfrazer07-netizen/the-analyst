@@ -5,6 +5,10 @@ import HealthCheckQuiz from "../HealthCheckQuiz";
 import VoiceNote from "../VoiceNote";
 import { journal } from "@/lib/mockData";
 import { JTrade } from "@/lib/types";
+import { useVoiceNotes } from "@/lib/voiceNotes";
+
+const sentimentColor = (sentiment: "disciplined" | "emotional" | "neutral" | null) =>
+  sentiment === "disciplined" ? "var(--bull)" : sentiment === "emotional" ? "var(--bear)" : "var(--muted)";
 
 function riskFlags(t: JTrade): string[] {
   const flags: string[] = [];
@@ -39,6 +43,8 @@ function accountHealth(insights: typeof journal.insights): { label: string; tone
 
 export default function JournalTab() {
   const health = accountHealth(journal.insights);
+  const { notes, addNote } = useVoiceNotes();
+  const voiceJournalEntries = notes.filter((n) => n.aiSummary);
 
   return (
     <div className="flex flex-col gap-4 pb-28">
@@ -53,11 +59,30 @@ export default function JournalTab() {
         <p className="mt-2 text-xs leading-relaxed text-muted">{health.note}</p>
       </GlassCard>
 
-      <VoiceNote />
+      <VoiceNote notes={notes} onAddNote={addNote} />
 
       <GlassCard>
         <SectionTitle>Recent Trades</SectionTitle>
         <div className="mt-2 flex flex-col gap-3">
+          {voiceJournalEntries.map((n) => (
+            <div key={n.id} className="rounded-xl border border-accent/40 bg-accent/10 p-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-bold uppercase tracking-wide text-accent">🎙 Voice journal</span>
+                  {n.aiSymbol && <span className="text-sm font-semibold text-text">{n.aiSymbol}</span>}
+                </div>
+                <span
+                  className="text-[10px] font-bold uppercase"
+                  style={{ color: sentimentColor(n.aiSentiment) }}
+                >
+                  {n.aiSentiment}
+                </span>
+              </div>
+              <p className="mt-1.5 text-xs leading-relaxed text-text">{n.aiSummary}</p>
+              {n.aiKeyLesson && <p className="mt-1 text-[11px] italic text-purple-hi/80">Lesson: {n.aiKeyLesson}</p>}
+              <div className="mt-1.5 text-[10px] text-muted">{new Date(n.timestamp).toLocaleString()}</div>
+            </div>
+          ))}
           {journal.trades.map((t) => {
             const flags = riskFlags(t);
             return (

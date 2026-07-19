@@ -1,14 +1,9 @@
 "use client";
 
-import { GlassCard, SectionTitle, GhostButton } from "../ui";
+import { GlassCard, SectionTitle } from "../ui";
+import PremiumUnlockCTA from "../PremiumUnlockCTA";
 
-export default function ProfileTab({
-  isPremium,
-  onUnlock,
-}: {
-  isPremium: boolean;
-  onUnlock: () => void;
-}) {
+export default function ProfileTab({ isPremium }: { isPremium: boolean }) {
   if (!isPremium) {
     return (
       <div className="flex flex-col gap-4 pb-28">
@@ -22,10 +17,7 @@ export default function ProfileTab({
           <div className="mt-4 text-3xl font-extrabold text-purple-hi">
             $8<span className="text-base font-semibold text-muted">/month</span>
           </div>
-          <GhostButton accent className="mt-4" onClick={onUnlock}>
-            Unlock Premium (demo)
-          </GhostButton>
-          <div className="mt-2 text-[11px] text-muted">Demo unlock — no payment wired up yet.</div>
+          <PremiumUnlockCTA />
         </GlassCard>
       </div>
     );

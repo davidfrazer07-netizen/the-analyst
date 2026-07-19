@@ -12,14 +12,14 @@ import JournalTab from "@/components/tabs/JournalTab";
 import CoachTab from "@/components/tabs/CoachTab";
 import ProfileTab from "@/components/tabs/ProfileTab";
 import { useTaraFeed } from "@/lib/taraFeed";
+import { usePremium } from "@/lib/premium";
 
 export default function Home() {
   const [showIntro, setShowIntro] = useState(true);
   const [tab, setTab] = useState("fundamentals");
-  const [isPremium, setIsPremium] = useState(false);
-  const unlock = () => setIsPremium(true);
 
-  const { status, news, lastError, refresh } = useTaraFeed();
+  const { status, news, fundamentals, lastError, refresh } = useTaraFeed();
+  const { isPremium } = usePremium();
 
   return (
     <AuthGate>
@@ -28,11 +28,11 @@ export default function Home() {
         <HUDBackground />
         <Header status={status} lastError={lastError} refresh={refresh} />
         <main className="mx-auto w-full max-w-md flex-1 px-4 pt-2">
-          {tab === "fundamentals" && <FundamentalsTab news={news} />}
-          {tab === "technicals" && <TechnicalsTab isPremium={isPremium} onUnlock={unlock} />}
+          {tab === "fundamentals" && <FundamentalsTab news={news} liveFundamentals={fundamentals} />}
+          {tab === "technicals" && <TechnicalsTab isPremium={isPremium} />}
           {tab === "journal" && <JournalTab />}
           {tab === "coach" && <CoachTab />}
-          {tab === "profile" && <ProfileTab isPremium={isPremium} onUnlock={unlock} />}
+          {tab === "profile" && <ProfileTab isPremium={isPremium} />}
         </main>
         <TabBar active={tab} onChange={setTab} />
       </div>

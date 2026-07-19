@@ -56,14 +56,18 @@ export function NewsCard({ item }: { item: NewsItem }) {
           ))}
         </div>
 
-        <a
-          href={item.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-1.5 inline-block text-[10px] text-accent hover:underline"
-        >
-          {item.source} ↗
-        </a>
+        {item.url ? (
+          <a
+            href={item.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-1.5 inline-block text-[10px] text-accent hover:underline"
+          >
+            {item.source} ↗
+          </a>
+        ) : (
+          <span className="mt-1.5 inline-block text-[10px] text-muted">{item.source}</span>
+        )}
       </div>
     </div>
   );

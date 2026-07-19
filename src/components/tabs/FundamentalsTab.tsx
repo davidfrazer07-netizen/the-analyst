@@ -3,15 +3,23 @@
 import { useState } from "react";
 import { GlassCard, SectionTitle, BiasPill, Pill } from "../ui";
 import { NewsList } from "../NewsCard";
-import { fundamentals } from "@/lib/mockData";
+import { fundamentals as mockFundamentals } from "@/lib/mockData";
 import { newsFeed } from "@/lib/newsAndProfiles";
-import type { NewsItem } from "@/lib/types";
+import type { NewsItem, CurrencyFundamental } from "@/lib/types";
 
 type FundamentalsTabProps = {
   news: NewsItem[];
+  liveFundamentals: CurrencyFundamental[];
 };
 
-export default function FundamentalsTab({ news }: FundamentalsTabProps) {
+export default function FundamentalsTab({ news, liveFundamentals }: FundamentalsTabProps) {
+  // Live analysis only covers whichever currencies the Doc's strength[]
+  // lists that day (often a subset) — merge it over the static list so
+  // covered currencies show today's real data and the rest still render.
+  const fundamentals = mockFundamentals.map(
+    (mock) => liveFundamentals.find((live) => live.currency === mock.currency) ?? mock
+  );
+
   const [selected, setSelected] = useState(fundamentals[0].currency);
   const active = fundamentals.find((f) => f.currency === selected)!;
 
@@ -38,13 +46,14 @@ export default function FundamentalsTab({ news }: FundamentalsTabProps) {
         </div>
         <div className="mt-1 text-base font-semibold text-text">{active.headline}</div>
         <p className="mt-2 text-sm leading-relaxed text-muted">{active.summary}</p>
+        <p className="mt-2 text-[10px] uppercase tracking-wide text-muted">Updated {active.updatedAt}</p>
       </GlassCard>
 
       <GlassCard>
         <SectionTitle>Drivers & Impact vs. History</SectionTitle>
         <div className="mt-2 flex flex-col gap-3">
-          {active.drivers.map((d) => (
-            <div key={d.label} className="rounded-xl border border-line bg-surface2/40 p-3">
+          {active.drivers.map((d, i) => (
+            <div key={`${d.label}-${i}`} className="rounded-xl border border-line bg-surface2/40 p-3">
               <div className="flex items-center justify-between">
                 <div className="text-sm font-semibold text-text">{d.label}</div>
                 <span
@@ -55,7 +64,7 @@ export default function FundamentalsTab({ news }: FundamentalsTabProps) {
                 </span>
               </div>
               <p className="mt-1.5 text-xs leading-relaxed text-muted">{d.detail}</p>
-              <p className="mt-1 text-xs italic text-purple-hi/80">{d.vsHistory}</p>
+              {d.vsHistory && <p className="mt-1 text-xs italic text-purple-hi/80">{d.vsHistory}</p>}
             </div>
           ))}
         </div>
