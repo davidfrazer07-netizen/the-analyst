@@ -66,7 +66,26 @@ Deno.serve(async (req: Request) => {
         body: JSON.stringify({
           model: "tencent/hy3:free",
           messages: journalMessages,
-          response_format: { type: "json_object" },
+          // This model's OpenRouter route (Novita) only supports the
+          // json_schema response format, not json_object.
+          response_format: {
+            type: "json_schema",
+            json_schema: {
+              name: "trade_journal_entry",
+              strict: true,
+              schema: {
+                type: "object",
+                properties: {
+                  summary: { type: "string" },
+                  sentiment: { type: "string", enum: ["disciplined", "emotional", "neutral"] },
+                  keyLesson: { type: "string" },
+                  symbol: { type: ["string", "null"] },
+                },
+                required: ["summary", "sentiment", "keyLesson", "symbol"],
+                additionalProperties: false,
+              },
+            },
+          },
           max_tokens: 400,
         }),
       });
