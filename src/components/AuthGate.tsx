@@ -96,7 +96,16 @@ function LoginScreen() {
       <GlassCard className="w-full max-w-sm">
         <SectionTitle>Sign in to continue</SectionTitle>
         <div className="mt-4">
-          <GhostButton accent className="w-full" onClick={() => supabase?.auth.signInWithOAuth({ provider: "google" })}>
+          <GhostButton
+            accent
+            className="w-full"
+            onClick={() =>
+              supabase?.auth.signInWithOAuth({
+                provider: "google",
+                options: { redirectTo: window.location.href },
+              })
+            }
+          >
             Continue with Google
           </GhostButton>
         </div>
