@@ -121,6 +121,50 @@ export const fundamentals: CurrencyFundamental[] = [
     ],
     updatedAt: "placeholder",
   },
+  {
+    currency: "CHF",
+    bias: "bull",
+    headline: "SNB cautiously tolerant of franc strength amid safe-haven bids",
+    summary:
+      "Swiss franc remains bid on geopolitical safe-haven flows, but the SNB warns on overvaluation and keeps intervention risk alive while inflation stays subdued.",
+    drivers: [
+      {
+        label: "SNB policy stance",
+        detail: "SNB held rates and signaled readiness to act against excessive franc appreciation.",
+        impact: "high",
+        vsHistory: "Less active intervention than the peak bouts last cycle",
+      },
+      {
+        label: "Safe-haven flows",
+        detail: "Renewed risk aversion pushed inflows into CHF despite low yields.",
+        impact: "medium",
+        vsHistory: "Stronger than the muted flows seen earlier in the year",
+      },
+    ],
+    updatedAt: "placeholder",
+  },
+  {
+    currency: "NZD",
+    bias: "neutral",
+    headline: "RBNZ on hold while dairy prices offset soft local growth",
+    summary:
+      "RBNZ remains patient as soft growth data argues for cuts, but firmer dairy and commodity prices versus Australia keep NZD from breaking lower.",
+    drivers: [
+      {
+        label: "RBNZ rate path",
+        detail: "RBNZ held and trimmed hike bias, waiting on clearer inflation confirmation.",
+        impact: "medium",
+        vsHistory: "Most dovish guidance since the easing debate opened",
+      },
+      {
+        label: "Dairy prices",
+        detail: "Global dairy auction prices rebounded, supporting export income expectations.",
+        impact: "low",
+        vsHistory: "Sharpest recovery in prices since the mid-year slump",
+      },
+    ],
+    updatedAt: "placeholder",
+  },
 ];
 
 export const educationTopics: EducationTopic[] = [
