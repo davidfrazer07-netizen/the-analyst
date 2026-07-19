@@ -46,22 +46,39 @@ function insidePoly(x: number, y: number, poly: Poly): boolean {
   return c;
 }
 
+function isLand(lon: number, lat: number): boolean {
+  for (const poly of CONTINENTS) {
+    if (insidePoly(lon, lat, poly)) return true;
+  }
+  return false;
+}
+
 function computeLandDots(): [number, number][] {
   const pts: [number, number][] = [];
   for (let lat = -78; lat <= 80; lat += 4.5) {
     for (let lon = -180; lon < 180; lon += 4.5) {
-      for (const poly of CONTINENTS) {
-        if (insidePoly(lon, lat, poly)) {
-          pts.push([lon, lat]);
-          break;
-        }
-      }
+      if (isLand(lon, lat)) pts.push([lon, lat]);
+    }
+  }
+  return pts;
+}
+
+// Ocean dots sit on a coarser, unaligned grid (6°) from the land dots
+// (4.5°) — without excluding land points here, the two layers render
+// close-but-not-identical dots over every continent, reading as
+// overlapping clutter instead of one clean layer per region.
+function computeOceanDots(): [number, number][] {
+  const pts: [number, number][] = [];
+  for (let lat = -80; lat <= 80; lat += 6) {
+    for (let lon = -180; lon < 180; lon += 6) {
+      if (!isLand(lon, lat)) pts.push([lon, lat]);
     }
   }
   return pts;
 }
 
 const LAND_DOTS = computeLandDots();
+const OCEAN_DOTS = computeOceanDots();
 const TILT = 0.42;
 
 function project(lonDeg: number, latDeg: number, rot: number, R: number, cx: number, cy: number) {
@@ -120,16 +137,14 @@ export default function WireframeGlobe({
       ctx.lineWidth = 1.2;
       ctx.stroke();
 
-      for (let oLa = -80; oLa <= 80; oLa += 6) {
-        for (let oLo = -180; oLo < 180; oLo += 6) {
-          const { x, y, z } = project(oLo, oLa, rot, R, cx, cy);
-          if (z > 0.05) {
-            const r = 1.5;
-            ctx.beginPath();
-            ctx.arc(x, y, r, 0, Math.PI * 2);
-            ctx.fillStyle = hexAlpha(tint, 0.35 + z * 0.35);
-            ctx.fill();
-          }
+      for (const [oLo, oLa] of OCEAN_DOTS) {
+        const { x, y, z } = project(oLo, oLa, rot, R, cx, cy);
+        if (z > 0.05) {
+          const r = 1.5;
+          ctx.beginPath();
+          ctx.arc(x, y, r, 0, Math.PI * 2);
+          ctx.fillStyle = hexAlpha(tint, 0.35 + z * 0.35);
+          ctx.fill();
         }
       }
 
