@@ -5,11 +5,18 @@ import { GlassCard, SectionTitle, BiasPill, Pill } from "../ui";
 import { NewsList } from "../NewsCard";
 import { fundamentals } from "@/lib/mockData";
 import { newsFeed } from "@/lib/newsAndProfiles";
+import type { NewsItem } from "@/lib/types";
 
-export default function FundamentalsTab() {
+type FundamentalsTabProps = {
+  news: NewsItem[];
+};
+
+export default function FundamentalsTab({ news }: FundamentalsTabProps) {
   const [selected, setSelected] = useState(fundamentals[0].currency);
   const active = fundamentals.find((f) => f.currency === selected)!;
-  const currencyNews = newsFeed.filter((n) => n.currency === selected);
+
+  const liveNews = news.filter((n) => n.currency === selected);
+  const currencyNews = liveNews.length > 0 ? liveNews : newsFeed.filter((n) => n.currency === selected);
 
   const impactColor = (impact: string) =>
     impact === "high" ? "var(--bear)" : impact === "medium" ? "var(--accent)" : "var(--muted)";

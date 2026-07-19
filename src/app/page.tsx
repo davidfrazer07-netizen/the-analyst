@@ -11,6 +11,7 @@ import TechnicalsTab from "@/components/tabs/TechnicalsTab";
 import JournalTab from "@/components/tabs/JournalTab";
 import CoachTab from "@/components/tabs/CoachTab";
 import ProfileTab from "@/components/tabs/ProfileTab";
+import { useTaraFeed } from "@/lib/taraFeed";
 
 export default function Home() {
   const [showIntro, setShowIntro] = useState(true);
@@ -18,14 +19,16 @@ export default function Home() {
   const [isPremium, setIsPremium] = useState(false);
   const unlock = () => setIsPremium(true);
 
+  const { status, news, lastError, refresh } = useTaraFeed();
+
   return (
     <AuthGate>
       <div className="relative flex min-h-screen flex-col">
         {showIntro && <IntroSplash onDone={() => setShowIntro(false)} />}
         <HUDBackground />
-        <Header />
+        <Header status={status} lastError={lastError} refresh={refresh} />
         <main className="mx-auto w-full max-w-md flex-1 px-4 pt-2">
-          {tab === "fundamentals" && <FundamentalsTab />}
+          {tab === "fundamentals" && <FundamentalsTab news={news} />}
           {tab === "technicals" && <TechnicalsTab isPremium={isPremium} onUnlock={unlock} />}
           {tab === "journal" && <JournalTab />}
           {tab === "coach" && <CoachTab />}

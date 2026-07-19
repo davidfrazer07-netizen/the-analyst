@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import type { NewsItem } from "./types";
 
 // The deployed Google Apps Script Web App that reads Dave's daily Doc and
 // serves Tara's feed JSON. CORS is open (access-control-allow-origin: *),
@@ -19,6 +20,7 @@ const RETRY_DELAYS_MS = [1500, 4000]; // Apps Script cold-starts can make the fi
 
 export function useTaraFeed() {
   const [status, setStatus] = useState<SyncStatus>("idle");
+  const [news, setNews] = useState<NewsItem[]>([]);
   const [lastSynced, setLastSynced] = useState<string | null>(null);
   const [lastError, setLastError] = useState<string | null>(null);
   const mountedRef = useRef(true);
@@ -34,8 +36,17 @@ export function useTaraFeed() {
     try {
       const res = await fetch(TARA_FEED_URL, { cache: "no-store" });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      await res.json();
+      const data = await res.json();
+      // Live worldNews items don't carry `firstSeen` — the placeholder mock
+      // data does, so backfill it with today's date to satisfy NewsItem.
+      const today = new Date().toISOString().slice(0, 10);
+      const worldNews = Array.isArray(data?.feed?.worldNews) ? data.feed.worldNews : [];
+      const parsed: NewsItem[] = worldNews.map((item: Omit<NewsItem, "firstSeen">) => ({
+        ...item,
+        firstSeen: today,
+      }));
       if (!mountedRef.current) return true;
+      setNews(parsed);
       setStatus("connected");
       setLastSynced(new Date().toISOString());
       setLastError(null);
@@ -64,5 +75,5 @@ export function useTaraFeed() {
     refresh();
   }, [refresh]);
 
-  return { status, lastSynced, lastError, refresh };
+  return { status, news, lastSynced, lastError, refresh };
 }

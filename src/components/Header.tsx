@@ -1,10 +1,14 @@
 "use client";
 
-import { useTaraFeed } from "@/lib/taraFeed";
+import type { SyncStatus } from "@/lib/taraFeed";
 
-export default function Header() {
-  const { status, lastError, refresh } = useTaraFeed();
+type HeaderProps = {
+  status: SyncStatus;
+  lastError: string | null;
+  refresh: () => void;
+};
 
+export default function Header({ status, lastError, refresh }: HeaderProps) {
   const dotColor = status === "connected" ? "var(--bull)" : status === "error" ? "var(--bear)" : "var(--muted)";
   const label = status === "connected" ? "Synced" : status === "loading" ? "Syncing…" : status === "error" ? "Offline" : "—";
   const title = status === "error" && lastError ? `Sync failed: ${lastError} (tap to retry)` : label;
