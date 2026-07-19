@@ -2,12 +2,14 @@
 
 import { useState } from "react";
 import { GlassCard, SectionTitle, Pill, GhostButton } from "./ui";
+import ProfileDiagram, { ProfileSide } from "./ProfileDiagram";
 import type { DeliveryProfiles } from "@/lib/types";
 import { deliveryProfiles } from "@/lib/newsAndProfiles";
 
 export default function ProfilesSection() {
   const [isUnlocked, setIsUnlocked] = useState(false);
   const [session, setSession] = useState<"am" | "pm">("am");
+  const [side, setSide] = useState<ProfileSide>("bull");
 
   if (!isUnlocked) {
     return (
@@ -32,13 +34,23 @@ export default function ProfilesSection() {
     <GlassCard>
       <SectionTitle>Session Delivery Profiles</SectionTitle>
 
-      <div className="mt-3 flex gap-2">
-        <Pill active={session === "am"} onClick={() => setSession("am")}>
-          AM
-        </Pill>
-        <Pill active={session === "pm"} onClick={() => setSession("pm")}>
-          NY PM
-        </Pill>
+      <div className="mt-3 flex items-center justify-between">
+        <div className="flex gap-2">
+          <Pill active={session === "am"} onClick={() => setSession("am")}>
+            AM
+          </Pill>
+          <Pill active={session === "pm"} onClick={() => setSession("pm")}>
+            NY PM
+          </Pill>
+        </div>
+        <div className="flex gap-2">
+          <Pill active={side === "bull"} onClick={() => setSide("bull")}>
+            Bullish
+          </Pill>
+          <Pill active={side === "bear"} onClick={() => setSide("bear")}>
+            Bearish
+          </Pill>
+        </div>
       </div>
 
       <div className="mt-3 flex flex-wrap gap-2">
@@ -54,6 +66,10 @@ export default function ProfilesSection() {
           <div key={p.id} className="rounded-xl border border-line bg-surface2/40 p-3">
             <div className="text-sm font-semibold text-text">
               Profile {p.num}: {p.title}
+            </div>
+
+            <div className="mt-2">
+              <ProfileDiagram num={p.num} side={side} windows={set.windows.map((w) => w.split(" ")[0])} />
             </div>
 
             <div className="mt-2">

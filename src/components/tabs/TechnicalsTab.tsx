@@ -11,8 +11,13 @@ const CANNED_REPLIES: Record<string, string> = {
   support:
     "Support is a price level where historical buying pressure has repeatedly stopped a decline. Resistance is the mirror: a level where selling pressure has repeatedly stopped an advance. Mark them from prior swing highs/lows and reactions, not every minor wiggle.",
   default:
-    "Good question — for now I'm running on placeholder responses. Once connected to a live model, I'll answer strategy and market-structure questions directly here.",
+    "Good question — the live AI assistant isn't connected yet (needs the Supabase backend deployed), so I'm running on placeholder responses for now.",
 };
+
+// Set via NEXT_PUBLIC_AI_ASSISTANT_URL at build time once the Supabase Edge
+// Function (supabase/functions/ai-assistant) is deployed. Safe to expose —
+// it's an endpoint URL, not a credential. Falls back to canned replies if unset.
+const AI_ASSISTANT_URL = process.env.NEXT_PUBLIC_AI_ASSISTANT_URL;
 
 export default function TechnicalsTab() {
   const [answers, setAnswers] = useState<Record<string, boolean | null>>({});
@@ -20,19 +25,45 @@ export default function TechnicalsTab() {
     { role: "assistant", text: "Ask me anything about your strategy, market structure, or a concept you're unsure about." },
   ]);
   const [draft, setDraft] = useState("");
+  const [sending, setSending] = useState(false);
 
   const healthScore = Object.values(answers).filter(Boolean).length;
   const answeredCount = Object.values(answers).filter((v) => v !== null && v !== undefined).length;
 
-  const send = () => {
-    if (!draft.trim()) return;
+  const send = async () => {
+    if (!draft.trim() || sending) return;
     const q = draft.trim();
-    setChat((c) => [...c, { role: "user", text: q }]);
-    const reply = q.toLowerCase().includes("support") || q.toLowerCase().includes("resistance")
-      ? CANNED_REPLIES.support
-      : CANNED_REPLIES.default;
+    const nextChat = [...chat, { role: "user" as const, text: q }];
+    setChat(nextChat);
     setDraft("");
-    setTimeout(() => setChat((c) => [...c, { role: "assistant", text: reply }]), 300);
+
+    if (!AI_ASSISTANT_URL) {
+      const reply =
+        q.toLowerCase().includes("support") || q.toLowerCase().includes("resistance")
+          ? CANNED_REPLIES.support
+          : CANNED_REPLIES.default;
+      setTimeout(() => setChat((c) => [...c, { role: "assistant", text: reply }]), 300);
+      return;
+    }
+
+    setSending(true);
+    try {
+      const res = await fetch(AI_ASSISTANT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: q,
+          history: nextChat.slice(0, -1).map((m) => ({ role: m.role, content: m.text })),
+        }),
+      });
+      const data = await res.json();
+      const reply = res.ok ? data.reply : `AI assistant error: ${data.error ?? "unknown"}`;
+      setChat((c) => [...c, { role: "assistant", text: reply }]);
+    } catch {
+      setChat((c) => [...c, { role: "assistant", text: "Couldn't reach the AI assistant. Try again shortly." }]);
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -111,7 +142,7 @@ export default function TechnicalsTab() {
             className="flex-1 rounded-xl border border-line bg-surface2/40 px-3 py-2 text-sm text-text placeholder:text-muted focus:outline-none focus:border-accent"
           />
           <GhostButton accent onClick={send} className="w-auto px-4">
-            Send
+            {sending ? "…" : "Send"}
           </GhostButton>
         </div>
       </GlassCard>

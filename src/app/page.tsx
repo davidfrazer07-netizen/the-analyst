@@ -19,7 +19,7 @@ export default function Home() {
   return (
     <div className="relative flex min-h-screen flex-col">
       {showIntro && <IntroSplash onDone={() => setShowIntro(false)} />}
-      <HUDBackground showGlobe={tab !== "profile"} />
+      <HUDBackground />
       <Header />
       <main className="mx-auto w-full max-w-md flex-1 px-4 pt-2">
         {tab === "fundamentals" && <FundamentalsTab />}

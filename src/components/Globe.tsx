@@ -120,14 +120,14 @@ export default function WireframeGlobe({
       ctx.lineWidth = 1;
       ctx.stroke();
 
-      for (let oLa = -80; oLa <= 80; oLa += 9) {
-        for (let oLo = -180; oLo < 180; oLo += 9) {
+      for (let oLa = -80; oLa <= 80; oLa += 6) {
+        for (let oLo = -180; oLo < 180; oLo += 6) {
           const { x, y, z } = project(oLo, oLa, rot, R, cx, cy);
           if (z > 0.05) {
-            const r = 0.8;
+            const r = 1.3;
             ctx.beginPath();
             ctx.arc(x, y, r, 0, Math.PI * 2);
-            ctx.fillStyle = hexAlpha(tint, 0.1 + z * 0.1);
+            ctx.fillStyle = hexAlpha(tint, 0.22 + z * 0.2);
             ctx.fill();
           }
         }
@@ -136,8 +136,8 @@ export default function WireframeGlobe({
       for (const [lo2, la2] of LAND_DOTS) {
         const { x, y, z } = project(lo2, la2, rot, R, cx, cy);
         if (z > 0.04) {
-          const s = 1.0 + z * 1.4;
-          const op = 0.3 + z * 0.45;
+          const s = 1.4 + z * 1.8;
+          const op = 0.45 + z * 0.5;
           ctx.beginPath();
           ctx.arc(x, y, s / 2, 0, Math.PI * 2);
           ctx.fillStyle = hexAlpha(coolColor, op);

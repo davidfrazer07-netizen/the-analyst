@@ -51,9 +51,9 @@ html, body {
 .glass-card {
   padding: 16px;
   border-radius: 16px;
-  background: color-mix(in srgb, var(--surface) 20%, transparent);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  background: color-mix(in srgb, var(--surface) 12%, transparent);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
   border: 1px solid color-mix(in srgb, var(--accent) 50%, transparent);
   box-shadow: 0 0 14px color-mix(in srgb, var(--accent) 22%, transparent);
   position: relative;

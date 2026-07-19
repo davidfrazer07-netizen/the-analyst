@@ -25,14 +25,14 @@ export const TABS: TabDef[] = [
 export default function TabBar({ active, onChange }: { active: string; onChange: (id: string) => void }) {
   return (
     <div className="fixed inset-x-0 bottom-0 z-30 flex justify-center px-4 pb-6">
-      <div className="flex items-center gap-1 rounded-full border border-line bg-surface/70 px-2 py-2 backdrop-blur-xl shadow-[0_0_20px_rgba(176,108,255,0.15)]">
+      <div className="flex w-full max-w-md items-center rounded-full border border-line bg-surface/70 px-2 py-2 backdrop-blur-xl shadow-[0_0_20px_rgba(47,178,255,0.18)]">
         {TABS.map((t) => {
           const isActive = t.id === active;
           return (
             <button
               key={t.id}
               onClick={() => onChange(t.id)}
-              className={`flex flex-col items-center gap-0.5 rounded-full px-3.5 py-1.5 transition-all ${
+              className={`flex flex-1 flex-col items-center gap-0.5 rounded-full py-1.5 transition-all ${
                 isActive ? "bg-accent/20" : ""
               }`}
             >
