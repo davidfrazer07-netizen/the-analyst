@@ -2,17 +2,7 @@ import {
   CurrencyFundamental,
   EducationTopic,
   Journal,
-  LeaderboardEntry,
-  P2POffer,
-  StrategyQuestion,
 } from "./types";
-
-// Placeholder content — swap for the live Google Doc sync once the doc is shared.
-export const analystDocStatus = {
-  connected: false,
-  sourceLabel: "Google Doc sync (not yet connected)",
-  lastSynced: null as string | null,
-};
 
 export const fundamentals: CurrencyFundamental[] = [
   {
@@ -133,20 +123,31 @@ export const fundamentals: CurrencyFundamental[] = [
   },
 ];
 
-export const strategyQuestions: StrategyQuestion[] = [
-  { id: "q1", question: "Did you wait for your full confluence checklist before entering?", category: "process" },
-  { id: "q2", question: "Was your position size calculated from a fixed risk %, or picked on feel?", category: "risk" },
-  { id: "q3", question: "Did you move your stop-loss after entry?", category: "risk" },
-  { id: "q4", question: "Did you close the trade early out of fear, before it hit SL or TP?", category: "psychology" },
-  { id: "q5", question: "Are you trading a session/instrument outside your defined strategy rules?", category: "process" },
-  { id: "q6", question: "How many trades have you taken today outside your plan?", category: "psychology" },
-];
-
 export const educationTopics: EducationTopic[] = [
-  { id: "e1", title: "What is support and resistance?", description: "How to mark levels that actually matter and avoid over-drawing your chart." },
-  { id: "e2", title: "Reading a delivery profile", description: "How Tara's session profile schematic maps price behavior to a repeatable pattern." },
-  { id: "e3", title: "Position sizing from risk %", description: "Turning your stop-loss distance into a lot size that respects your account risk limit." },
-  { id: "e4", title: "Why moving your stop-loss kills your edge", description: "The math behind why discretionary SL moves erode expectancy over a large sample." },
+  {
+    id: "e1",
+    title: "What is support and resistance?",
+    description: "How to mark levels that actually matter and avoid over-drawing your chart.",
+    videoUrl: "https://www.youtube.com/watch?v=eeCEUA7wgkU",
+  },
+  {
+    id: "e2",
+    title: "Reading a delivery profile (AMD / Power of Three)",
+    description: "How the accumulation-manipulation-distribution cycle maps price behavior to a repeatable pattern.",
+    videoUrl: "https://www.youtube.com/watch?v=TQS-eJxKMcQ",
+  },
+  {
+    id: "e3",
+    title: "Position sizing from risk %",
+    description: "Turning your stop-loss distance into a lot size that respects your account risk limit.",
+    videoUrl: "https://www.youtube.com/watch?v=FPuSBu1bp2Y",
+  },
+  {
+    id: "e4",
+    title: "Why moving your stop-loss kills your edge",
+    description: "The psychology behind discretionary SL moves and how to stop making them mid-trade.",
+    videoUrl: "https://www.youtube.com/watch?v=8kR9ARo0efE",
+  },
 ];
 
 export const journal: Journal = {
@@ -227,16 +228,3 @@ export const journal: Journal = {
   ],
 };
 
-export const leaderboard: LeaderboardEntry[] = [
-  { rank: 1, handle: "@goldrunner", winRate: 71, trustScore: 98, verified: true },
-  { rank: 2, handle: "@fxdisciple", winRate: 66, trustScore: 95, verified: true },
-  { rank: 3, handle: "@londonopen", winRate: 64, trustScore: 91, verified: true },
-  { rank: 4, handle: "@crt_dave", winRate: 61, trustScore: 88, verified: false },
-  { rank: 5, handle: "@nyamscalp", winRate: 58, trustScore: 84, verified: true },
-];
-
-export const p2pOffers: P2POffer[] = [
-  { id: "p1", handle: "@goldrunner", side: "sell", amountUSDT: 500, pricePerUSDT: 1.001, trustScore: 98, completedTrades: 214 },
-  { id: "p2", handle: "@fxdisciple", side: "buy", amountUSDT: 1200, pricePerUSDT: 0.998, trustScore: 95, completedTrades: 156 },
-  { id: "p3", handle: "@londonopen", side: "sell", amountUSDT: 300, pricePerUSDT: 1.002, trustScore: 91, completedTrades: 88 },
-];

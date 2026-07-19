@@ -28,3 +28,26 @@ back to canned placeholder replies — no broken UI, just no live model.
 Uses `nvidia/nemotron-3-ultra-550b-a55b:free` via OpenRouter. Free-tier model
 slugs rotate — check `npx supabase functions deploy` still works and swap the
 `MODEL` constant in `functions/ai-assistant/index.ts` if OpenRouter retires it.
+The AI Coach tab (`CoachTab.tsx`) calls this same function URL.
+
+## Login (Supabase Auth)
+
+Uses `@supabase/supabase-js` directly from the browser — the anon key is
+meant to be public (Row Level Security policies protect data, not key
+secrecy), so no proxy is needed here, unlike the OpenRouter key above.
+
+1. In your Supabase project: Authentication → Providers → enable Google,
+   following Supabase's Google OAuth setup guide (needs a Google Cloud OAuth
+   client ID/secret).
+2. Authentication → URL Configuration → add your GitHub Pages URL
+   (`https://davidfrazer07-netizen.github.io/the-analyst/`) to the redirect
+   allowlist.
+3. Add two more GitHub Actions repo variables (Settings → Secrets and
+   variables → Actions → Variables): `NEXT_PUBLIC_SUPABASE_URL` and
+   `NEXT_PUBLIC_SUPABASE_ANON_KEY` (both from Project Settings → API in
+   Supabase — the anon key, never the service role key).
+4. Push to `main` to rebuild with auth enabled.
+
+Until these are set, the app shows a "Sign-in not configured yet" screen
+with a "Continue as guest (dev preview)" bypass, so local testing still
+works without blocking on this setup.

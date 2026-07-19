@@ -54,17 +54,23 @@ export function GhostButton({
   children,
   onClick,
   accent = false,
+  disabled = false,
+  type = "button",
   className = "",
 }: {
   children: ReactNode;
   onClick?: () => void;
   accent?: boolean;
+  disabled?: boolean;
+  type?: "button" | "submit";
   className?: string;
 }) {
   return (
     <button
+      type={type}
       onClick={onClick}
-      className={`w-full rounded-xl px-4 py-3 text-sm font-semibold transition active:opacity-70 ${
+      disabled={disabled}
+      className={`w-full rounded-xl px-4 py-3 text-sm font-semibold transition active:opacity-70 disabled:opacity-50 disabled:cursor-not-allowed ${
         accent
           ? "bg-accent/20 text-purple-hi border border-accent/70 hud-glow"
           : "bg-surface2/50 text-text border border-line"

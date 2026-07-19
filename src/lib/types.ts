@@ -74,6 +74,7 @@ export interface EducationTopic {
   id: string;
   title: string;
   description: string;
+  videoUrl: string;
 }
 
 // --- Coach / Community

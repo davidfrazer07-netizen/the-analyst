@@ -6,8 +6,13 @@ import ProfileDiagram, { ProfileSide } from "./ProfileDiagram";
 import type { DeliveryProfiles } from "@/lib/types";
 import { deliveryProfiles } from "@/lib/newsAndProfiles";
 
-export default function ProfilesSection() {
-  const [isUnlocked, setIsUnlocked] = useState(false);
+export default function ProfilesSection({
+  isUnlocked,
+  onUnlock,
+}: {
+  isUnlocked: boolean;
+  onUnlock: () => void;
+}) {
   const [session, setSession] = useState<"am" | "pm">("am");
   const [side, setSide] = useState<ProfileSide>("bull");
 
@@ -20,7 +25,7 @@ export default function ProfilesSection() {
           showing market conditions, key characteristics and what to focus on as a trader.
         </p>
         <div className="mt-4">
-          <GhostButton accent onClick={() => setIsUnlocked(true)}>
+          <GhostButton accent onClick={onUnlock}>
             Unlock Premium (demo)
           </GhostButton>
         </div>

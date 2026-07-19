@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { GlassCard, SectionTitle, BiasPill, Pill } from "../ui";
 import { NewsList } from "../NewsCard";
-import { analystDocStatus, fundamentals } from "@/lib/mockData";
+import { fundamentals } from "@/lib/mockData";
 import { newsFeed } from "@/lib/newsAndProfiles";
 
 export default function FundamentalsTab() {
@@ -16,28 +16,6 @@ export default function FundamentalsTab() {
 
   return (
     <div className="flex flex-col gap-4 pb-28">
-      <GlassCard className="!border-line !shadow-none">
-        <div className="flex items-center justify-between">
-          <div>
-            <div className="section-title">The Analyst</div>
-            <div className="mt-1 text-xs text-muted">
-              {analystDocStatus.connected
-                ? `Synced from Google Doc · ${analystDocStatus.lastSynced}`
-                : "Live Google Doc sync not connected yet — showing placeholder briefing"}
-            </div>
-          </div>
-          <span
-            className="rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide"
-            style={{
-              background: analystDocStatus.connected ? "rgba(53,227,164,0.16)" : "rgba(161,145,196,0.16)",
-              color: analystDocStatus.connected ? "var(--bull)" : "var(--muted)",
-            }}
-          >
-            {analystDocStatus.connected ? "Live" : "Placeholder"}
-          </span>
-        </div>
-      </GlassCard>
-
       <div className="flex gap-2 overflow-x-auto pb-1">
         {fundamentals.map((f) => (
           <Pill key={f.currency} active={f.currency === selected} onClick={() => setSelected(f.currency)}>

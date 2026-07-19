@@ -2,6 +2,7 @@
 
 import { GlassCard, SectionTitle, BiasPill } from "../ui";
 import HealthCheckQuiz from "../HealthCheckQuiz";
+import VoiceNote from "../VoiceNote";
 import { journal } from "@/lib/mockData";
 import { JTrade } from "@/lib/types";
 
@@ -52,38 +53,7 @@ export default function JournalTab() {
         <p className="mt-2 text-xs leading-relaxed text-muted">{health.note}</p>
       </GlassCard>
 
-      <GlassCard>
-        <SectionTitle>Risk Guidance</SectionTitle>
-        <div className="mt-2 flex flex-col gap-2.5 text-xs text-muted">
-          <div className="flex items-center justify-between rounded-lg border border-line bg-surface2/40 px-3 py-2">
-            <span>Trades closed early</span>
-            <span className="font-semibold text-text">{journal.insights.closedEarly}</span>
-          </div>
-          <div className="flex items-center justify-between rounded-lg border border-line bg-surface2/40 px-3 py-2">
-            <span>Left money on the table</span>
-            <span className="font-semibold text-text">{journal.insights.leftMoneyOnTable}</span>
-          </div>
-          <div className="flex items-center justify-between rounded-lg border border-line bg-surface2/40 px-3 py-2">
-            <span>No stop-loss set</span>
-            <span className="font-semibold" style={{ color: journal.insights.noStop > 0 ? "var(--bear)" : "var(--text)" }}>
-              {journal.insights.noStop}
-            </span>
-          </div>
-          <div className="flex items-center justify-between rounded-lg border border-line bg-surface2/40 px-3 py-2">
-            <span>Followed-strategy win rate</span>
-            <span className="font-semibold text-bull">{journal.insights.followedWinRate}%</span>
-          </div>
-          <div className="flex items-center justify-between rounded-lg border border-line bg-surface2/40 px-3 py-2">
-            <span>Off-strategy win rate</span>
-            <span className="font-semibold text-bear">{journal.insights.notFollowedWinRate}%</span>
-          </div>
-        </div>
-        <p className="mt-3 text-xs leading-relaxed text-purple-hi/80">
-          {journal.insights.followedWinRate - journal.insights.notFollowedWinRate > 25
-            ? "Your edge only shows up when you follow the plan. Off-strategy trades are actively costing you — sizing down or skipping them entirely would raise your expectancy the most."
-            : "Keep logging every trade with confluences noted so this comparison stays reliable."}
-        </p>
-      </GlassCard>
+      <VoiceNote />
 
       <GlassCard>
         <SectionTitle>Recent Trades</SectionTitle>
